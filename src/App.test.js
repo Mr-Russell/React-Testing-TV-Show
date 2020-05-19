@@ -2,6 +2,7 @@ import React from 'react';
 import {render, waitFor} from '@testing-library/react';
 import App from './App.js'
 import {fetchShow as mockFetchShow} from './api/fetchShow.js'
+import userEvent from '@testing-library/user-event'
 
 jest.mock('./api/fetchShow.js')
 
@@ -146,4 +147,17 @@ test('Renders App div element after API data has been recieved', async ()=>{
   const app = render(<App />)
 
   await waitFor(()=> expect(app.queryByTestId(/appdiv/i)).toBeInTheDocument)
+})
+
+test('User can select Season from dropdown menu', async ()=>{
+  mockFetchShow.mockResolvedValueOnce(strangerThings)
+
+  const app = render(<App />)
+
+  await waitFor(()=> expect(app.queryByTestId(/appdiv/i)).toBeInTheDocument)
+
+  const dropdown = app.getByText(/select a season/i)
+  userEvent.click(dropdown)
+  userEvent.selectOptions(app.getByText(/season 1/i))
+  expect(app.getByText(/chapter two: the weirdo on maple street/i)).toBeInTheDocument()
 })
